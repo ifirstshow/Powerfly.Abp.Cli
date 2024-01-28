@@ -1,0 +1,48 @@
+﻿{{ for schema in schemas }}
+{{- if schema.enums == null }}
+export type {{ schema.name }} = {
+	{{- for property in schema.properties }}
+	{{ property.name }}{{ property.is_required ? "" : "?" }}: {{ property.type }}
+	{{- end }}
+}
+{{ else }}
+export enum {{ schema.name }} {
+	{{- for enum in schema.enums }}
+	{{ enum.key }} = {{ enum.value }},
+	{{- end }}
+}
+{{ end }}
+{{- end }}
+import { HttpRequest, type RequestConfig } from '@/utils/http'
+
+export default class {{ project }}Api extends HttpRequest {
+	{{- for operation in operations }}
+	{{ operation.key | camelize }} = {
+		{{- for api in operation }}
+		{{ api.name | camelize }}: (
+			{{- for path in api.path_parameters }}
+			{{ path.name | camelize }}{{ path.is_required ? "" : "?" }}: {{ path.type }},
+			{{- end }}
+			{{- if api.query_parameters.size > 0 }}
+			params: {
+				{{- for query in api.query_parameters }}
+				{{ query.name | camelize }}{{ query.is_required ? "" : "?" }}: {{ query.type }}
+				{{- end }}
+			},
+			{{- end }}
+			{{- if api.request_body != null }}
+			data: {{ api.request_body }},
+			{{- end }}
+			options?: RequestConfig
+		) => this.request<{{ api.response ?? "void" }}>({
+			url: `{{ api.path | replace "{" "${" }}`,
+			method: "{{ api.method }}",
+			{{- if api.query_parameters.size > 0 }}
+			params,
+			{{- end }}
+			...(options || {})
+		})
+		{{ end }}
+	}
+	{{ end }}
+}
