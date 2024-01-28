@@ -13,5 +13,7 @@ namespace Powerfly.Abp.Cli.Commands
         public string? OutputFolder { get; set; }
 
         public string? TemplateSource { get; set; }
+
+        public string? ProjectName { get; set; }
     }
 }

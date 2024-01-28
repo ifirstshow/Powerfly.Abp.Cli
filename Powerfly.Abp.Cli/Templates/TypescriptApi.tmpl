@@ -15,7 +15,7 @@ export enum {{ schema.name }} {
 {{- end }}
 import { HttpRequest, type RequestConfig } from '@/utils/http'
 
-export default class {{ project }}Api extends HttpRequest {
+export default class {{ project }} extends HttpRequest {
 	{{- for operation in operations }}
 	{{ operation.key | camelize }} = {
 		{{- for api in operation }}

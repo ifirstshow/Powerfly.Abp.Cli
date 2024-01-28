@@ -14,8 +14,9 @@ namespace Powerfly.Abp.Cli.Commands
         {
             var command = new Command("api", "Generate api code base on swagger json document");
             command.AddOption(new Option<string[]>(new string[] { "--swagger-urls", "-url" }, "The swagger json document url.") { IsRequired = true });
-            command.AddOption(new Option<string>(new string[] { "--output-folder", "-o" }, () => "./", "Specifies the output folder. Default value is the current directory."));
-            command.AddOption(new Option<string>(new string[] { "--template-source", "-ts" }, "Specifies a custom template source to use to build the project."));
+            command.AddOption(new Option<string>(new string[] { "--output-folder", "-o" }, () => "./", "Specifies the output folder. Default value is the ./ directory."));
+            command.AddOption(new Option<string>(new string[] { "--template-source", "-ts" }, ()=> "./Templates", "Specifies a custom template source to use to build the project. Default value is the ./Templates directory."));
+            command.AddOption(new Option<string>(new string[] { "--project-name", "-n" }, () => "AbpApi", "Specifies the project's name. Default value is AbpApi."));
 
             command.SetHandler(HandleAsync, new CommandBinder<GenerateApiCommandOptions>(command.Options));
 
@@ -53,7 +54,8 @@ namespace Powerfly.Abp.Cli.Commands
                 .ToList();
 
 
-            var filePath = Path.Combine(AppContext.BaseDirectory, $"./Templates/TypescriptApi.tmpl");
+
+            var filePath = Path.Combine(AppContext.BaseDirectory, $"{options.TemplateSource}/TypescriptApi.tmpl");
             if (File.Exists(filePath))
             {
                 var tmpl = File.ReadAllText(filePath);
@@ -62,7 +64,7 @@ namespace Powerfly.Abp.Cli.Commands
                 var script = new ScriptObject();
                 script.Import(new
                 {
-                    project = "Abp",
+                    project = options.ProjectName,
                     schemas = schemasList,
                     operations = operationsList.GroupBy(t => t.Tags?.FirstOrDefault())
                         .OrderBy(t => t.Key)
@@ -72,7 +74,7 @@ namespace Powerfly.Abp.Cli.Commands
 
                 var content = template.Render(new TemplateContext(script));
 
-                File.WriteAllText(filePath.Replace(".tmpl", ".ts"), content);
+                File.WriteAllText(Path.Combine(options.OutputFolder, options.ProjectName + ".ts"), content);
             }
         }
     }

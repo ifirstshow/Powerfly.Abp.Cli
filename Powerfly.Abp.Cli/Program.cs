@@ -7,8 +7,6 @@ namespace Powerfly.Abp.Cli
     {
         static async Task<int> Main(string[] args)
         {
-            args = ["generate", "api", "-url", @"https://localhost:44330/swagger/v1/swagger.json", "-url", @"https://localhost:44353/swagger/v1/swagger.json"];
-
             var rootCommand = new RootCommand()
             {
                 Description = "A tool to make development with abp vnext easier.",
