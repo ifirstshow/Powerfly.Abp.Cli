@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Powerfly.Abp.Cli.Definitions
 {
-    public class ApiOperationDefinition
+    public class ApiOperationDefinition : ApiDefinitionBase
     {
         public string Path { get; }
 
@@ -39,11 +39,16 @@ namespace Powerfly.Abp.Cli.Definitions
                 Tags.Remove(tag);
                 Tags.Insert(0, "Account");
             }
-            else if (tag == "Profile")
+            else if (tag == "TimeZoneSettings")
             {
                 Tags.Remove(tag);
-                Tags.Insert(0, "MyProfile");
+                Tags.Insert(0, "Timezone");
             }
+            //else if (tag == "Profile")
+            //{
+            //    Tags.Remove(tag);
+            //    Tags.Insert(0, "MyProfile");
+            //}
 
             PathParameters = schema.ActualParameters.Where(t => t.Kind == OpenApiParameterKind.Path)
                 .Select(t => new ApiPropertyDefinition(t))
@@ -59,18 +64,15 @@ namespace Powerfly.Abp.Cli.Definitions
                 if (schema.RequestBody.Content.TryGetValue("application/json", out body)
                     || schema.RequestBody.Content.TryGetValue("text/json", out body))
                 {
-                    if (body.Schema.HasReference)
-                    {
-                        RequestBody = RefectionHelper.FormatTypeName(body.Schema.Reference.Title);
-                    }
+                    RequestBody = FormatTypeName(body.Schema);
                 }
             }
 
             if (schema.ActualResponses.TryGetValue("200", out var response))
             {
-                if (response.Schema?.HasReference == true)
+                if (response.Schema != null)
                 {
-                    Response = RefectionHelper.FormatTypeName(response.Schema.Reference.Title);
+                    Response = FormatTypeName(response.Schema);
                 }
             }
 
@@ -98,7 +100,7 @@ namespace Powerfly.Abp.Cli.Definitions
                     {
                         case "GET":
                             builder.Append("Get");
-                            if (Response?.Contains("ListResult") == true || Response?.Contains("PagedResult") == true)
+                            if (Response?.Contains("ListResult") == true || Response?.Contains("PagedResult") == true || Response?.EndsWith("[]") == true)
                             {
                                 builder.Append("List");
                             }

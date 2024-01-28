@@ -44,6 +44,10 @@ namespace Powerfly.Abp.Cli.Commands
                 operationsList.AddRange(operations);
             }
 
+            foreach (var schema in schemasList.Where(t => t.Name.Contains("<") && t.Name.EndsWith(">")))
+            {
+            }
+
             schemasList = schemasList.DistinctBy(t => t.Name)
                 .OrderBy(t => t.Name)
                 .ToList();

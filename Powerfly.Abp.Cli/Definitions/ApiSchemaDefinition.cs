@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Powerfly.Abp.Cli.Definitions
 {
-    public class ApiSchemaDefinition
+    public class ApiSchemaDefinition : ApiDefinitionBase
     {
         public string Name { get; }
 
@@ -17,7 +17,7 @@ namespace Powerfly.Abp.Cli.Definitions
 
         public ApiSchemaDefinition(string name, JsonSchema schema)
         {
-            Name = RefectionHelper.FormatTypeName(name);
+            Name = FormatTypeName(name);
 
             if (schema.IsEnumeration)
             {
@@ -32,6 +32,34 @@ namespace Powerfly.Abp.Cli.Definitions
                 foreach (var property in schema.ActualProperties)
                 {
                     Properties.Add(new ApiPropertyDefinition(property.Key, property.Value));
+                }
+            }
+
+            if (Name.Contains("<") && Name.EndsWith(">"))
+            {
+                var genericTypes = Name.Substring(Name.IndexOf("<")).Trim('<', '>').Split(',')
+                    .Select(t => t.Trim())
+                    .ToArray();
+                Name = Name.Substring(0, Name.IndexOf("<"));
+
+                if (genericTypes.Length == 1)
+                {
+                    Name = Name + "<T>";
+                    foreach (var property in Properties)
+                    {
+                        property.Type = property.Type.Replace(genericTypes[0], "T");
+                    }
+                }
+                else
+                {
+                    Name = Name + string.Join(", ", genericTypes.Select((t, i) => "T" + (i + 1)));
+                    for (var i = 0; i < genericTypes.Length; i++)
+                    {
+                        foreach (var property in Properties)
+                        {
+                            property.Type = property.Type.Replace(genericTypes[i], "T" + (i + 1));
+                        }
+                    }
                 }
             }
         }

@@ -12,7 +12,15 @@
 	<RepositoryUrl>https://github.com/ifirstshow/Powerfly.Abp.Cli.git</RepositoryUrl>
 	<PackageTags>abp;abpcli;generator</PackageTags>
 	<Description>A tool to make development with abp vnext easier.</Description>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
