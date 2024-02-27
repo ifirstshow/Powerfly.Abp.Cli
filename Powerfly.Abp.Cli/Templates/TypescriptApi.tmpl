@@ -34,11 +34,12 @@ export default class {{ project }} extends HttpRequest {
 			data: {{ api.request_body }},
 			{{- end }}
 			options?: RequestConfig
-		) => this.request<{{ api.response ?? "void" }}>({
-			url: `{{ api.path | replace "{" "${" }}`,
-			method: "{{ api.method }}",
+		) => this.{{ api.method | lower_case }}<{{ api.response ?? "void" }}>(`{{ api.path | replace "{" "${" }}`, {
 			{{- if api.query_parameters.size > 0 }}
 			params,
+			{{- end }}
+			{{- if api.request_body != null }}
+			data,
 			{{- end }}
 			...(options || {})
 		}),

@@ -33,5 +33,15 @@ namespace Powerfly.Abp.Cli
         {
             return text.Kebaberize();
         }
+
+        public static string UpperCase(string text)
+        {
+            return text.ToUpper();
+        }
+
+        public static string LowerCase(string text)
+        {
+            return text.ToLower();
+        }
     }
 }
